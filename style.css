@@ -1,0 +1,14 @@
+*{
+	margin: 0;
+	padding: 0;
+}
+
+.container{
+	margin: 100px 5px 5px 5px;
+}
+
+.div2{
+	background-color: black;
+	text-align: center;
+	color: white;
+}
