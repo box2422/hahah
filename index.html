@@ -1,16 +1,407 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Cục Cứt</title>
-	<link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating Images Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #dbeafe 0%, #f3e8ff 50%, #fce7f3 100%);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background floating elements */
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            animation: float-slow 12s ease-in-out infinite;
+        }
+
+        /* Main container */
+        .container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .main-content {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        /* Floating images */
+        .floating-image {
+            display: flex;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .floating-image.left {
+            justify-content: flex-end;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-image.right {
+            justify-content: flex-start;
+            animation: float-reverse 8s ease-in-out infinite;
+        }
+
+        .image-wrapper {
+            position: relative;
+            width: 200px;
+            height: 300px;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+        }
+
+        .image-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, #ec4899, #8b5cf6);
+            border-radius: 1rem;
+            filter: blur(20px);
+            opacity: 0.3;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-wrapper:hover::before {
+            opacity: 0.5;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .image-wrapper.girl img {
+            object-position: center 20%;
+        }
+
+        .image-wrapper.boy img {
+            object-position: center 30%;
+        }
+
+        .image-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-wrapper:hover::after {
+            opacity: 1;
+        }
+
+        .floating-image:hover .image-wrapper {
+            transform: scale(1.1);
+        }
+
+        /* Counter section */
+        .counter-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1.5rem;
+        }
+
+        .counter-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #374151;
+            animation: fade-in 1s ease-out;
+        }
+
+        .counter-container {
+            position: relative;
+        }
+
+        .counter-bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            border-radius: 1.5rem;
+            filter: blur(30px);
+            opacity: 0.3;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .counter-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(4px);
+            border-radius: 1.5rem;
+            padding: 3rem 4rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .counter-number {
+            font-size: 5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #2563eb, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: number-glow 3s ease-in-out infinite;
+        }
+
+        .counter-label {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #4b5563;
+            margin-top: 1rem;
+        }
+
+        .counter-subtitle {
+            font-size: 1.25rem;
+            color: #6b7280;
+            animation: fade-in-delay 1s ease-out 0.5s both;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+            25% { transform: translateY(-20px) translateX(10px) rotate(2deg); }
+            50% { transform: translateY(-10px) translateX(-5px) rotate(-1deg); }
+            75% { transform: translateY(-25px) translateX(15px) rotate(3deg); }
+        }
+
+        @keyframes float-reverse {
+            0%, 100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+            25% { transform: translateY(15px) translateX(-10px) rotate(-2deg); }
+            50% { transform: translateY(25px) translateX(8px) rotate(1deg); }
+            75% { transform: translateY(5px) translateX(-12px) rotate(-3deg); }
+        }
+
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(-30px) translateX(20px); }
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fade-in-delay {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes number-glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(147, 51, 234, 0.3); }
+            50% { text-shadow: 0 0 30px rgba(147, 51, 234, 0.5), 0 0 40px rgba(59, 130, 246, 0.3); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+                text-align: center;
+            }
+
+            .floating-image.left,
+            .floating-image.right {
+                justify-content: center;
+            }
+
+            .counter-title {
+                font-size: 2rem;
+            }
+
+            .counter-number {
+                font-size: 4rem;
+            }
+
+            .counter-card {
+                padding: 2rem 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .image-wrapper {
+                width: 150px;
+                height: 225px;
+            }
+
+            .counter-title {
+                font-size: 1.5rem;
+            }
+
+            .counter-number {
+                font-size: 3rem;
+            }
+
+            .counter-card {
+                padding: 1.5rem 2rem;
+            }
+
+            .counter-label {
+                font-size: 1.25rem;
+            }
+
+            .counter-subtitle {
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-	<div>
-		<div style="text-align: center; margin-top: 20px ;">
-			<h1>Nhìn cái gì mà nhìn ?</h1>
-		</div>
-	</div>
+    <!-- Background floating elements -->
+    <div id="background-elements"></div>
+
+    <!-- Main container -->
+    <div class="container">
+        <div class="main-content">
+            <!-- Left floating image -->
+            <div class="floating-image left" id="leftImage">
+                <div class="image-wrapper girl">
+                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/nhaanh.jpg-XUuvKp2L66y4RdH7FBN2UHjiTqFFgS.jpeg" alt="Girl portrait">
+                </div>
+            </div>
+
+            <!-- Center counter -->
+            <div class="counter-section">
+                <h1 class="counter-title">Đã trôi qua</h1>
+                
+                <div class="counter-container">
+                    <div class="counter-bg"></div>
+                    <div class="counter-card">
+                        <div class="counter-number" id="dayCounter">0</div>
+                        <div class="counter-label">ngày</div>
+                    </div>
+                </div>
+
+                <p class="counter-subtitle">Kể từ ngày 27/07/2022</p>
+            </div>
+
+            <!-- Right floating image -->
+            <div class="floating-image right" id="rightImage">
+                <div class="image-wrapper boy">
+                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/do.jpg-NkLRViq4w3lBBnrgLzHRjHBNYI32Tb.jpeg" alt="Boy portrait">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create background floating elements
+        function createBackgroundElements() {
+            const container = document.getElementById('background-elements');
+            for (let i = 0; i < 15; i++) {
+                const element = document.createElement('div');
+                element.className = 'bg-element';
+                element.style.left = Math.random() * 100 + '%';
+                element.style.top = Math.random() * 100 + '%';
+                element.style.width = (20 + Math.random() * 30) + 'px';
+                element.style.height = element.style.width;
+                element.style.animationDelay = Math.random() * 10 + 's';
+                element.style.animationDuration = (8 + Math.random() * 4) + 's';
+                container.appendChild(element);
+            }
+        }
+
+        // Calculate days since start date
+        function calculateDays() {
+            const startDate = new Date('2022-07-27');
+            const currentDate = new Date();
+            const timeDifference = currentDate.getTime() - startDate.getTime();
+            const dayDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
+            
+            const counter = document.getElementById('dayCounter');
+            counter.textContent = dayDifference.toLocaleString();
+        }
+
+        // Mouse parallax effect
+        function handleMouseMove(e) {
+            const leftImage = document.getElementById('leftImage');
+            const rightImage = document.getElementById('rightImage');
+            
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            const moveX = (e.clientX - centerX) * 0.02;
+            const moveY = (e.clientY - centerY) * 0.02;
+            
+            leftImage.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            rightImage.style.transform = `translate(${-moveX}px, ${-moveY}px)`;
+        }
+
+        // Hover effects
+        function addHoverEffects() {
+            const leftImage = document.getElementById('leftImage');
+            const rightImage = document.getElementById('rightImage');
+            
+            leftImage.addEventListener('mouseenter', function() {
+                this.style.transform += ' rotate(3deg)';
+            });
+            
+            leftImage.addEventListener('mouseleave', function() {
+                this.style.transform = this.style.transform.replace(' rotate(3deg)', '');
+            });
+            
+            rightImage.addEventListener('mouseenter', function() {
+                this.style.transform += ' rotate(-3deg)';
+            });
+            
+            rightImage.addEventListener('mouseleave', function() {
+                this.style.transform = this.style.transform.replace(' rotate(-3deg)', '');
+            });
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            createBackgroundElements();
+            calculateDays();
+            addHoverEffects();
+            
+            // Update day counter daily
+            setInterval(calculateDays, 24 * 60 * 60 * 1000);
+            
+            // Add mouse move listener
+            document.addEventListener('mousemove', handleMouseMove);
+        });
+    </script>
 </body>
 </html>
